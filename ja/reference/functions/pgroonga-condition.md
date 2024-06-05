@@ -50,7 +50,7 @@ title &@~ pgroonga_condition('keyword', index_name => 'index_name')
 この関数の構文は次の通りです。
 
 ```
-pgroonga_condition pgroonga_condition(query,
+pgroonga_condition pgroonga_condition(keyword,
                                       weights,
                                       scorers,
                                       schema_name,
@@ -58,39 +58,47 @@ pgroonga_condition pgroonga_condition(query,
                                       column_name)
 ```
 
-`query`は検索キーワードです。`text`型です。
+* `keyword`は検索キーワードです。`text`型です。
 
-`weights`はそれぞれの値の重要度です。`int[]`型です。
+* `weights`はそれぞれの値の重要度です。`int[]`型です。
 
-`scorers`はそれぞれの値のスコアーを計算する処理です。`text[]`型です。
+* `scorers`はそれぞれの値のスコアーを計算する処理です。`text[]`型です。
 
-`schema_name`はシーケンシャルサーチ実行時に参照するインデックスが属するスキーマです。`text`型です。
+* `schema_name`はシーケンシャルサーチ実行時に参照するインデックスが属するスキーマです。`text`型です。
 
-`index_name`はシーケンシャルサーチ実行時に参照するインデックスです。`text`型です。
+* `index_name`はシーケンシャルサーチ実行時に参照するインデックスです。`text`型です。
 
-`column_name`はシーケンシャルサーチ実行時に参照するインデックスが紐付けられている属性です。`text`型です。
+* `column_name`はシーケンシャルサーチ実行時に参照するインデックスが紐付けられている属性です。`text`型です。
+
+* `fuzzy_max_distance_ratio`
+
+  * データ型は`float4`
+
+  * Groongaの[fuzzy_max_distance_ratio](https://groonga.org/ja/docs/reference/commands/select.html#select-fuzzy-max-distance-ratio)が使えます。
+
+  * 3.2.1で追加
 
 `pgroonga_condition()`の引数はすべて省略可能です。そのため、[「`引数名 => 値`」][sql-syntax-calling-funcs-named]という名前付き表記を使うことで特定の引数だけ指定することができます。たとえば、`index_name`だけ指定する場合は`pgroonga_condition(index_name => 'index1')`となります。
 ただ、一般的なユースケースでは次の3種類の書き方を覚えておけば十分です。
 
 ```
-title &@~ pgroonga_condition('query', index_name => 'pgroonga_index')
-title &@~ pgroonga_condition('query', ARRAY[weight1, weight2, ...])
-title &@~ pgroonga_condition('query', ARRAY[weight1, weight2, ...], index_name => 'pgroonga_index')
+title &@~ pgroonga_condition('keyword', index_name => 'pgroonga_index')
+title &@~ pgroonga_condition('keyword', ARRAY[weight1, weight2, ...])
+title &@~ pgroonga_condition('keyword', ARRAY[weight1, weight2, ...], index_name => 'pgroonga_index')
 ```
 
 上の例以外の使い方をする場合のために、「`引数名 => 値`」で記述する必要がある引数とそうでない引数の違いを説明します。
 例えば、次は引数`weights`、`scorers`、`schema_name`、`column_name`を省略しています。
 
 ```
-title &@~ pgroonga_condition('query', index_name => 'pgroonga_index')
+title &@~ pgroonga_condition('keyword', index_name => 'pgroonga_index')
 ```
 
 引数`weights`と`scorers`と`schema_name`を省略したことで、引数`index_name`の指定は第2引数の位置にありますが、
 関数のシグネチャーでは`index_name`は第5引数なので、このケースでは、`index_name`は関数のシグネチャーと位置が異なる引数となります。
-一方、第1引数にある`query`は「`引数名 => 値`」という表記ではないので、関数のシグネチャーと位置が同じ引数となります。
+一方、第1引数にある`keyword`は「`引数名 => 値`」という表記ではないので、関数のシグネチャーと位置が同じ引数となります。
 
-つまり、関数のシグネチャーと同じ位置にある、`query`は、「`引数名 => 値`」の形で書く必要はなく、値をそのまま記述できますが、
+つまり、関数のシグネチャーと同じ位置にある、`keyword`は、「`引数名 => 値`」の形で書く必要はなく、値をそのまま記述できますが、
 関数のシグネチャーと違う位置にある、`index_name`は、「`引数名 => 値`」の形で書く必要があります。
 
 ## 使い方
