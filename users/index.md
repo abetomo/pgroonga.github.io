@@ -88,6 +88,22 @@ PGroonga also scales efficiently and maintains high performance even with comple
 
 The integration of PGroonga with IvorySQL was very smooth. Its exceptional search speed and high scalability allow us to deliver an experience for our users that rivals proprietary search engines, without the need for additional complex architecture. Users simply need to create a PGroonga index within IvorySQL to enjoy fast full-text search through simple SQL queries, significantly lowering the barrier to development and operational costs.
 
+## Multilingual knowledge search at Kuroko Labs {#kurokolabs}
+
+[Kuroko Labs](https://kurokolabs.ai/) is a Munich company building AI agents for manufacturers, working in Japanese and German. For a Japanese manufacturer we built and operate a knowledge search over internal documents written in Japanese and Thai (inspection reports, for example) that answers with the source passage attached. It serves sites in three countries and about 5,000 people.
+
+PGroonga does the full text search. One index on the `content` column with `TokenBigram` and `NormalizerNFKC150`, queried with `&@~`. Japanese and Thai run on the same index. We merge the results with vector search (pgvector) using Reciprocal Rank Fusion and hand the top candidates to Cohere Rerank for the final order.
+
+Two reasons for PGroonga. Internal documents are full of words no dictionary knows: new part numbers, in-house abbreviations, Thai loanwords. TokenBigram finds them without a dictionary. And the search engine stays inside PostgreSQL. The index sits next to pgvector in the same database, so there is nothing new to back up or monitor.
+
+Part numbers tripped us once. The default TokenBigram keeps a run of letters or digits as one token, so `QC-2031` does not match `203`. Instead of a finer tokenizer we extract part numbers with a regular expression into a separate column and match by prefix there.
+
+Design and operation details are in these articles (Japanese):
+
+* [Making Japanese text without spaces searchable in a RAG pipeline: PGroonga TokenBigram, pgvector and RRF](https://qiita.com/kurokolabs/items/c0b187822580dc5e96fb)
+* [When part numbers do not match: how PGroonga TokenBigram splits alphanumerics, and the workaround we chose](https://zenn.dev/kurokolabs/articles/dc7d8b1829c37f)
+* [Case study: multilingual knowledge agent](https://kurokolabs.ai/en/case-studies/rag-knowledge-agent)
+
 ## (Send us your service name)
 
 (Send us your service description, how do you use PGroonga and why did you choose PGroonga.)

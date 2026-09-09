@@ -101,6 +101,22 @@ PGroongaを選んだ理由は、PostgreSQLの外に検索エンジンを立て�
 * [pg_total_relation_sizeが20GBって言うから信じてたら、実際は56GB使ってた](https://zenn.dev/sato_ken/articles/667459027f2025)
 * [「Ｇ７」も「G7」も正規化するとg7になる。それでも検索結果は0件だった](https://zenn.dev/sato_ken/articles/651faad6e137ac)
 
+## Kuroko Labs の多言語ナレッジ検索 {#kurokolabs}
+
+[Kuroko Labs](https://kurokolabs.ai/ja/)（ドイツ・ミュンヘン）は、日本語とドイツ語で製造業向けの AI エージェントを作っている会社です。日本の製造業のお客様向けに、日本語とタイ語が混在する社内資料（検品報告書など）を出典付きで検索できる基盤を作り、運用しています。拠点は3か国、利用者はおよそ5,000人です。
+
+全文検索は PGroonga が担当しています。`content` 列に `TokenBigram` と `NormalizerNFKC150` でインデックスを1本作り、`&@~` で検索しています。日本語もタイ語も同じインデックスで動きます。ベクトル検索（pgvector）の結果と Reciprocal Rank Fusion で統合し、上位を Cohere Rerank に渡して最終順位を決めています。
+
+PGroonga を選んだ理由は二つあります。ひとつは、社内資料が辞書にない語の塊だったこと。新製品の型番、社内略語、タイ語からの借用語は形態素解析の辞書に載っていません。TokenBigram なら辞書なしで拾えます。もうひとつは、PostgreSQL の外に検索エンジンを置かずに済むこと。pgvector と同じデータベースに索引を足すだけなので、バックアップと監視の対象が増えません。
+
+型番の部分一致で一度つまずきました。既定の TokenBigram は英数字の連続をひとつのトークンにするので、`QC-2031` は `203` では当たりません。私たちは索引を細かくする代わりに、型番を正規表現で抜き出して別の列に置き、前方一致で処理しています。
+
+設計と運用の詳細は記事にまとめています。
+
+* [空白のない日本語を RAG で検索可能にする：PGroonga TokenBigram、pgvector、RRF の設計と運用](https://qiita.com/kurokolabs/items/c0b187822580dc5e96fb)
+* [型番が全文検索で当たらない。PGroonga TokenBigram の英数字の切り方と、私たちが選んだ逃げ道](https://zenn.dev/kurokolabs/articles/dc7d8b1829c37f)
+* [事例：多言語ナレッジエージェント](https://kurokolabs.ai/ja/case-studies/rag-knowledge-agent)
+
 ## （サービス名を教えてください）
 
 （サービスの説明、どのようにPGroongaを使っているか、どうしてPGroongaを選んだかを教えてください。）
